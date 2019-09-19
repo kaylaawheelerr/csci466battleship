@@ -1,8 +1,6 @@
 # load additional Python module
 import socket
-import http
-import requests
-import cgi
+
 # create TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -26,26 +24,21 @@ sock.bind(server_address)
 
 # listen for incoming connections (server mode) with one connection at a time
 sock.listen(1)
-# username="didnt change"
+
 while True:
+    # wait for a connection
     print ('waiting for a connection')
+    connection, client_address = sock.accept()
+
     try:
-        connection, client_address = sock.accept()
-        except KeyboardInterrupt:
-            connection.close()
         # show who connected to us
         print ('connection from', client_address)
 
         # receive the data in small chunks and print it
         while True:
-            data = connection.recv(1024)
-            # username=''
+            data = connection.recv(64)
             if data:
                 # output received data
-                if data == "a":
-                    print("the fuck?")
-                elif data == "test":
-                    print("really??test??")
                 print ("Data: %s" % data)
             else:
                 # no more data -- quit the loop
@@ -53,5 +46,4 @@ while True:
                 break
     finally:
         # Clean up the connection
-        # print(username)
         connection.close()

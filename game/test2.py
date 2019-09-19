@@ -1,6 +1,7 @@
 # load additional Python modules
 import socket
 import requests
+import http
 # create TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -15,13 +16,19 @@ ip_address = socket.gethostbyname(local_hostname)
 # ip_address = 153.90.19.189
 
 # bind the socket to the port 23456, and connect
-server_address = (ip_address, 8080)
+server_address = (ip_address, 23456)
 sock.connect(server_address)
 print ("connecting to %s (%s) with %s" % (local_hostname, local_fqdn, ip_address))
 
 data = str(input).encode("utf-8")
 sock.sendall
 
+url = 'http://' + ip_address + ':8080' 
+myobj = { input : 'Dylan'}
+
+x = requests.post(url, data = myobj)
+
+print(x.text)
 # define example data to be sent to the server
 # temperature_data = ["15", "22", "21", "26", "25", "19"]
 # for entry in temperature_data:
@@ -34,9 +41,3 @@ sock.sendall
 
 # close connection
 sock.close()
-# url = 'http://' + ip_address + ':8080'
-url = 'http://httpbin.org/post' 
-myobj = { "username" : "test"}
-
-x = requests.post(url, data = myobj,timeout=2)
-print(x.text)
