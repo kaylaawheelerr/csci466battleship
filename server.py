@@ -1,5 +1,5 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-
+import re
 from io import BytesIO
 
 
@@ -71,16 +71,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(b'Hello, world!')
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        body = self.rfile.read(content_length)
-        self.send_response(200)
-        self.end_headers()
-        response = BytesIO()
-        response.write(b'This is POST request. ')
-        response.write(b'Received: ')
-        response.write(body)
-        self.wfile.write(response.getvalue())
-    
+            self.send_response(202)
+            content = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content)
+            post_data = post_data.decode("utf-8")
+            coords=re.findall(r'\d+',post_data)
+            x = coords[0]
+            y = coords[1]
+            print("x = "+ x, " y = " + y)
+        
 httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
 httpd.serve_forever()
 
