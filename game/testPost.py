@@ -46,12 +46,11 @@ import time
 
 hostName = ""
 hostPort = 8080
-
+# HTTPServer.server_bind()
 class MyServer(BaseHTTPRequestHandler):
 
 	#	GET is for clients geting the predi
 	def do_GET(self):
-		
 		self.send_response(200)
 		self.wfile.write(bytes("<p>You accessed path: %s</p>" % self.path, "utf-8"))
 
@@ -60,8 +59,8 @@ class MyServer(BaseHTTPRequestHandler):
 
 		print("incomming http: " , self.path)
 
-		content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
-		post_data = self.rfile.read(content_length) # <--- Gets the data itself
+		# content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+		# post_data = self.rfile.read(content_length) # <--- Gets the data itself
 		self.send_response(200)
 		# client.close()
 

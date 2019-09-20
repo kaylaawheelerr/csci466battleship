@@ -31,8 +31,8 @@ while True:
     print ('waiting for a connection')
     try:
         connection, client_address = sock.accept()
-        except KeyboardInterrupt:
-            connection.close()
+    except KeyboardInterrupt:
+        connection.close()
         # show who connected to us
         print ('connection from', client_address)
 
@@ -41,12 +41,16 @@ while True:
             data = connection.recv(1024)
             # username=''
             if data:
-                # output received data
-                if data == "a":
-                    print("the fuck?")
-                elif data == "test":
-                    print("really??test??")
-                print ("Data: %s" % data)
+                def do_GET(connection):
+                    if connection.path == ("/?x=5&y=10"):
+                        connection.send_response(410)
+                    else:
+    	                connection.send_response(200)
+
+                def do_POST(connection):
+                    content = int(connection.headers['Content-Length'])
+                    post_data = connection.rfile.read(content)
+                    connection.send_response(202)
             else:
                 # no more data -- quit the loop
                 print ("no more data.")
