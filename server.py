@@ -4,8 +4,8 @@ from io import BytesIO
 
 
 #default file paths being used
-personal_board = r"/Users/christianmarquardt/Desktop/BattleShip/personal_board.txt"
-enemy_board = r"/Users/christianmarquardt/Desktop/BattleShip/enemy_board.txt"
+personal_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/personal_board.txt"
+enemy_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/enemy_board.txt"
 
 
 #Counting a hit at the spot on the board if it is there
@@ -33,11 +33,12 @@ def print_board(file):
     for i in board:
         print(i)
     board.close()
+    return board
 
 
 def checkForInput(xCoord,yCoord):
     if xCoord > 9 or xCoord < 0 and yCoord > 9 or yCoord < 0:
-        
+        return [404, "HTTP Not Found"]
     else:
         shotTaken(xCoord,yCoord)
 
@@ -112,7 +113,7 @@ def checkForSink(file):
         sinklist = sinkList + "Destroyer is sunk \n"
     return sinkList
 
-class Server(BaseHTTPRequestHandler):
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -135,8 +136,9 @@ class Server(BaseHTTPRequestHandler):
         coor = urllib.parse.parse_qs(self.path)
         xCoord = int(coor['x'][0])
         yCoord = int(coor['y'][0])
-        returnMessage = checkInput(xCoord, yCoord)
-        with open(board, 'w') as file:
+        returnMessage = checkForInput(xCoord, yCoord)
+        print("help")
+        with open(personal_board, 'w') as file:
             for line in myBoard:
                 file.write(''.join(line))
         self.send_response(returnMessage[0])
