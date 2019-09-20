@@ -1,5 +1,5 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import re
+import re, urllib
 from io import BytesIO
 
 
@@ -33,6 +33,13 @@ def print_board(file):
     for i in board:
         print(i)
     board.close()
+
+
+def checkForInput(xCoord,yCoord):
+    if xCoord > 9 or xCoord < 0 and yCoord > 9 or yCoord < 0:
+        
+    else:
+        shotTaken(xCoord,yCoord)
 
 #Here will process the shot
 def shotTaken(xCoord,yCoord):
@@ -105,22 +112,37 @@ def checkForSink(file):
         sinklist = sinkList + "Destroyer is sunk \n"
     return sinkList
 
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-
+class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write(b'Hello, world!')
+        boardFile = "Error"
+        if(self.path == '/own_board.html'):
+                boardFile = print_board('own_board.txt')
+        if(self.path == '/opponent_board.html'):
+                boardFile = print_board('opponent_board.txt')
+        prettyFile = '<html><body><h1><pre>' + boardFile + '</pre></h1></body></html>'
+        self.wfile.write(prettyFile.encode())
 
     def do_POST(self):
-            self.send_response(202)
-            content = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content)
-            post_data = post_data.decode("utf-8")
-            coords=re.findall(r'\d+',post_data)
-            x = coords[0]
-            y = coords[1]
-            print("x = "+ x, " y = " + y)
+        global myBoard
+        myBoard = []
+        f = open(personal_board, 'r')
+        for line in f:
+            myBoard.append(list(line))
+        f.close()
+        coor = urllib.parse.parse_qs(self.path)
+        xCoord = int(coor['x'][0])
+        yCoord = int(coor['y'][0])
+        returnMessage = checkInput(xCoord, yCoord)
+        with open(board, 'w') as file:
+            for line in myBoard:
+                file.write(''.join(line))
+        self.send_response(returnMessage[0])
+        self.send_header('Content-Type', 'text')
+        self.end_headers()
+        self.wfile.write(returnMessage[1].encode())
         
 httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
 httpd.serve_forever()
