@@ -13,7 +13,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     \nContent-Length: 64\n\nx = 1 & y = 2'
     m = urllib.parse.quote(m)
     m = bytes(m, 'utf-8')
-    print(m)
+    print("This is ",m)
     s.send(m)
     data = s.recv(1024)
 

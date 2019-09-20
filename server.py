@@ -114,6 +114,7 @@ def checkForSink(file):
     return sinkList
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    print(personal_board)
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -129,6 +130,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         global myBoard
         myBoard = []
+        print(personal_board)
         f = open(personal_board, 'r')
         for line in f:
             myBoard.append(list(line))
