@@ -20,4 +20,17 @@ myobj = { 'x' : sys.argv[1] , 'y' : sys.argv[2] }
 # requests.get(url,test)
 # requests.get(url, myobj)
 # print(requests.get(url,myobj))
-print(requests.post(url,myobj))
+response = (requests.post(url,myobj))
+
+if response.status_code == 200:
+    print("You got a hit!")
+if response.status_code == 300:
+    print("Miss! You suck!")
+if response.status_code == 350:
+    print("Spot already chosen!")
+if response.status_code == 400:
+    print("You sunk a ship!")
+if response.status_code == 420:
+    print("You won!")
+if response.status_code == 500:
+    print("You lost!")
