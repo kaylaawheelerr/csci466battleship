@@ -1,4 +1,6 @@
-import socket, re, sys, os
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+from io import BytesIO
 
 
 #default file paths being used
@@ -61,43 +63,25 @@ def countBoard(file):
                 numHits +=1
     return numHits
 
-def main():
-    port= int(sys.argv[1])
-    board = sys.argv[2]
-    personal_board = board
-    print(personal_board)
-    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.bind(('', port))
-    s.listen(1)
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
-    conn, address = s.accept()  # accept new connection
-    print("Connection from: " + str(address))
-    while True:
-    #while(countBoard(personal_board) != 17 and countBoard(enemy_board) != 17):
-    # receive data stream. it won't accept data packet greater than 1024 bytes
-        data = conn.recv(1024).decode()
-        if not data:
-            # if data is not received break
-            break
-        print("from connected user: " + str(data))
-        data = input(' -> ')
-        conn.send(data.encode('utf-8'))  # send data to the client
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'Hello, world!')
 
-    conn.close()  # close the connection
-   
-   
-   
-   
-   
-   
-   
-   
-
-
-       # s.listen(1)
-       ## conn, addr = s.accept()
-       # data=conn.recv(153)
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        body = self.rfile.read(content_length)
+        self.send_response(200)
+        self.end_headers()
+        response = BytesIO()
+        response.write(b'This is POST request. ')
+        response.write(b'Received: ')
+        response.write(body)
+        self.wfile.write(response.getvalue())
     
-           # shotTaken(x,y)
+    httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
+    httpd.serve_forever()
 
-main()
+   
