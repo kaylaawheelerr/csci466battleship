@@ -30,7 +30,7 @@ def check_table(hit_spot, x, y):
             BOARD[x][y] = '.'
 
 BOARD = bytes()
-createBoard(sys.argv[1])
+create_board(sys.argv[1])
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -46,7 +46,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         coords = re.findall(r'\d+', post_data)
         x = coords[0]
         y = coords[1]
-        result = handlePlay(x,y)
+        result = handle_play(x,y)
         if result == 'miss':
             self.send_response(300)
         elif result == 'taken':
