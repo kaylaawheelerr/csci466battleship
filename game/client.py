@@ -1,25 +1,27 @@
+#!/usr/bin/env python3
+
 import socket
+import urllib.parse
 
+HOST = '127.0.0.1'  # The server's hostname or IP address
+PORT = 65432        # The port used by the server
 
-def main():
-    ip = "localhost"
-    port = 8080
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # creates socket
-    s.connect((ip, port))  # connects us to server
-    print("Connected")
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    m = 'POST / localhost:65432 HTTP/1.1\nHost: localhost:65432 \
+                    \nContent-Type: application/x-www-form-urlencoded \
+                    \nContent-Length: 64\n\nx = 1 & y = 2'
+    m = urllib.parse.quote(m)
+    m = bytes(m, 'utf-8')
+    print(m)
+    s.send(m)
+    data = s.recv(1024)
 
-    #headers
-    coordinates = "22"
-    conntype = 'Connection: close'
-    conttype = 'Content-Type: application/x-uuu-form-urlencoded'
-    user = 'User-Agent: client.py'
-    contlen = 'Content-Length:  %s' % (len(coordinates))
+print('Received', repr(data))
 
-    s.send(bytes("POST / HTTP/1.1\n%s\n%s\n%s\n%s\n%s" %
-                 (conntype, conttype, user, contlen, coordinates)))  # post to server
-    data = s.recv(1024)  # decode data we get back from server
-    print(data)
+# POST / test HTTP/1.1
+# Host: foo.example
+# Content-Type: application/x-www-form-urlencoded
+# Content-Length: 27
 
-    s.close()  # close connection
-
-main()
+# field1 = value1 & field2 = value2
