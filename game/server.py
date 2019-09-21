@@ -25,9 +25,13 @@ def handle_play(x, y):
 def check_table(hit_spot, x, y):
     if hit_spot == 'D':
         BOARD[x][y] == '.'
+        return 'sunk'
     else:
         if BOARD[x][y-1] != BOARD[x][y] and BOARD[x][y+1] != BOARD[x][y]:
             BOARD[x][y] = '.'
+            return 'sunk'
+    return 'hit'
+            
 
 BOARD = bytes()
 create_board(sys.argv[1])
