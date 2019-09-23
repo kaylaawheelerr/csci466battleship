@@ -32,24 +32,23 @@ def countBoard(file):
 
 
 #Here will process the shot
-def sunkTest(file,letterSpot):
+def sunkTest(file,letterSpot,return_message):
     board = open(personal_board, "r")
     tempBoard = board.readlines()
     board.close()
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 0
-    sunkShip = 'hit=1\&sink=' + letterSpot
-    for i in range(10):
-        for j in range(10):
+                return return_message
             if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
-                return sunkShip.encode()
-    return 420
+                sunkShip = 'hit=1\&sink=' + letterSpot
+                return_message.update(sink = letterSpot)
+                return return_message
+    return_message.update(sink=letterSpot)
+    return_message.update(win=1)
+    return return_message
 
-def shotTaken(xCoord, yCoord):
-    xCoord = int(xCoord)
-    yCoord = int(yCoord)
+def shotTaken(xCoord, yCoord, return_message):
 
     board = open(personal_board, "r")
     tempBoard = board.readlines()
@@ -78,10 +77,9 @@ def shotTaken(xCoord, yCoord):
             shot_board.write(i)
         board.close()
         shot_board.close()
-        sink = sunkTest(board,letterSpot)
-        if sink == 0:
-            return 201
-        return sink
+        return_message.update(hit=1)
+        sink = sunkTest(board,letterSpot,return_message)
+        return return_message
 
     elif tempBoard[yCoord][xCoord] == "_":
         print("Shot and a miss!")
@@ -98,17 +96,18 @@ def shotTaken(xCoord, yCoord):
             shot_board.write(i)
         board.close()
         shot_board.close()
-        return 300
+        return return_message
 
     else:
-        return 350
+        return_message.update(status=409)
+        return_message.update(messgage='Gone')
+
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b'Hello, world!')
 
     def do_POST(self): 
         content = int(self.headers['Content-Length'])
@@ -118,18 +117,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         x = int(coords[0])
         y = int(coords[1])
         response = BytesIO()
+        return_message = {
+            'status' : 0,
+            'hit' : 0,
+            'sink' : 0,
+            'win' : 0,
+            'message' : ''
+        }
         if x > -1 and x < 10 and y > -1 and y < 10:
-            return_message = shotTaken(x,y)
-            if type(return_message) != int:
-                self.send_response(400)
-                response.write(return_message)
-                self.end_headers()
-            else:
-                self.send_response(return_message)
-                self.end_headers()
+            return_message.update(status=200)
+            return_message = shotTaken(x,y,return_message)
         else:
-            self.send_response(208)
-            self.end_headers()
+            return_message.update(status=404)
+            return_message.update(message='HTTP Not Found')
+
+        self.send_response(return_message.get('status'))
+        for key in return_message:
+            self.send_header(key,return_message.get(key))
+        self.end_headers()
         self.wfile.write(response.getvalue())
 
 httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)

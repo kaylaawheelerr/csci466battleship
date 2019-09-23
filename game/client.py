@@ -2,6 +2,7 @@ import requests
 import socket
 import json
 import sys
+import re
 
 local_hostname = socket.gethostname()
 ip_address = socket.gethostbyname(local_hostname)
@@ -10,8 +11,18 @@ url = 'http://localhost:8000'
 myobj = { 'x' : sys.argv[1] , 'y' : sys.argv[2] }
 
 response = (requests.post(url,myobj))
-print(response.text)
-print(response)
+response_message = response.text
+result = re.findall(r'\d+', response_message)
+sunk = response_message[-1:]
+if sunk != 0 and sunk != 1:
+    print(sunk)
+
+# if result[0] == '1':
+#     print('hit')
+# if result[0] == '0':
+#     print('miss')
+
+
 if response.status_code == 201:
     print("You got a hit!")
 if response.status_code == 300:
