@@ -31,14 +31,6 @@ def countBoard(file):
     return numHits
 
 
-#A simple print board method
-def print_board(file):
-    board = open(file, "r")
-    for i in board:
-        print(i)
-    board.close()
-    return board
-
 #Here will process the shot
 def sunkTest(file,letterSpot):
     board = open(personal_board, "r")
@@ -87,7 +79,6 @@ def shotTaken(xCoord, yCoord):
         board.close()
         shot_board.close()
         sink = sunkTest(board,letterSpot)
-        print_board(personal_board)
         if sink == 0:
             return 201
         return sink
@@ -107,7 +98,6 @@ def shotTaken(xCoord, yCoord):
             shot_board.write(i)
         board.close()
         shot_board.close()
-        print_board(personal_board)
         return 300
 
     else:
