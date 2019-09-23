@@ -102,7 +102,7 @@ def shotTaken(xCoord, yCoord, return_message):
         board.close()
         shot_board.close()
         return_message.update(hit=1)
-        sink = sunkTest(board,letterSpot,return_message)
+        return_message = sunkTest(board,letterSpot,return_message)
         return return_message
 
     elif tempBoard[yCoord][xCoord] == "_":
@@ -124,7 +124,8 @@ def shotTaken(xCoord, yCoord, return_message):
 
     else:
         return_message.update(status=409)
-        return_message.update(messgage='Gone')
+        return_message.update(message='Gone')
+        return return_message
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -133,11 +134,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"<html><style>.left{float:left}.opp{float:right}.inline{ display:flex}.grid-container{display: flex;}.grid-item{width: 35px; height: 35px; text-align:center; border:solid black 1px}</style><body><h1 class = 'container left'>"
-        +bytes(create_board(personal_board))+ 
-        b"</h1>"
-        +b"<h1 class='container opp'>"
-        +bytes(create_board(enemy_board))+
-        b"</h1></body></html>")
+                            +bytes(create_board(personal_board))+ 
+                            b"</h1>"
+                            +b"<h1 class='container opp'>"
+                            +bytes(create_board(enemy_board))+
+                            b"</h1></body></html>")
 
     def do_POST(self): 
         content = int(self.headers['Content-Length'])
@@ -154,19 +155,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             'win' : 0,
             'message' : ''
         }
+        print(return_message)
         if x > -1 and x < 10 and y > -1 and y < 10:
             return_message.update(status=200)
             return_message = shotTaken(x,y,return_message)
-                self.wfile.write(b"<html><style>.left{float:left}.opp{float:right}.inline{ display:flex}.grid-container{display: flex;}.grid-item{width: 35px; height: 35px; text-align:center; border:solid black 1px}</style><body><h1 class = 'container left'>"
-                +bytes(create_board(personal_board))+ 
-                b"</h1>"
-                +b"<h1 class='container opp'>"
-                +bytes(create_board(enemy_board))+
-                b"</h1></body></html>")
         else:
             return_message.update(status=404)
             return_message.update(message='HTTP Not Found')
 
+        print(return_message.get('status'))
         self.send_response(return_message.get('status'))
         for key in return_message:
             self.send_header(key,return_message.get(key))
