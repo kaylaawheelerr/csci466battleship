@@ -1,3 +1,8 @@
+# Christian Marquardt and Dylan Lynn
+# 9/23/3019
+# CSCI446 
+# PA1
+
 import urllib
 import re
 import sys
@@ -5,18 +10,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from io import BytesIO
 
-
-# def create_board(board_file):
-#     f = open(board_file, "r")
-#     if f.mode == 'r':
-#         BOARD = f.read()
-#         print(BOARD)
-
-
 #default file paths being used
 personal_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/game/own_board.txt"
 enemy_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/enemy_board.txt"
-
 
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
@@ -46,13 +42,17 @@ def print_board(file):
     return board
 
 
+
+#A middleman subfunction that determines if the coordinates being sent in are allowed to be used
 def checkForInput(xCoord, yCoord):
     if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
         return [404, "HTTP Not Found"]
     else:
+
+        #Processes the shot
         return shotTaken(xCoord, yCoord)
 
-#Here will process the shot
+#Test to see if we sunk the ship or not and pass that through
 def sunkTest(file,letterSpot):
     board = open(personal_board, "r")
     tempBoard = board.readlines()
@@ -60,10 +60,22 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 0
-    sunkShip = str("hit=1\&sink=" + letterSpot)
-    return sunkShip
+                return 1
+    if letterSpot == 'C':
+        return 201
+    elif letterSpot == 'B':
+        return 202
+    elif letterSpot == 'R':
+        return 203
+    elif letterSpot == 'S':
+        return 204
+    elif letterSpot == 'D':
+        return 205
+    else:
+        return 1
 
+
+#This takes the shot coordinates and opens the file and replaces the string row
 def shotTaken(xCoord, yCoord):
     xCoord = int(xCoord)
     yCoord = int(yCoord)
@@ -85,12 +97,15 @@ def shotTaken(xCoord, yCoord):
         for i in tempBoard:
             board.write(i)
         board.close()
+
+        #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
         print_board(personal_board)
-        if sink == "still alive":
+        if sink == 1:
             return 1
         return sink
 
+    #Here would be a miss and write a O on that spot
     elif tempBoard[yCoord][xCoord] == "_":
         print("Shot and a miss!")
         tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
@@ -103,15 +118,7 @@ def shotTaken(xCoord, yCoord):
         print_board(personal_board)
         return 0
 
-def create_board(board_file):
-    f = open(board_file, "r")
-    if f.mode == 'r':
-        BOARD = (f.read())
-        print(BOARD)
-    return(BOARD)
-
-
-def board_stringy(file):
+def boardWrite(file):
     f = open(file, "r")
     print(f)
     board_string =str()
@@ -125,13 +132,13 @@ def board_stringy(file):
     return(board_string)
 
 
-#BOARD = create_board(sys.argv[2])
+#The specific port we want to grab by typing onto the command line
 PORT = sys.argv[1]
-#board_string = board_string(personal_board)
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
-        board_string = board_stringy(personal_board)
+        board_string = boardWrite(personal_board)
         self.send_response(200)
         self.end_headers()
         self.send_header('Content-type' , "text/html")
@@ -146,10 +153,35 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         x = int(coords[0])
         y = int(coords[1])
         return_message = checkForInput(x,y)
+
+        #For a miss
         if return_message == 0:
             self.send_response(300)
+
+        #For a hit
         elif return_message == 1:
-            self.send_response(350)
+            self.send_response(200)
+        
+        #For sinking Carrier
+        elif return_message == 201:
+            self.send_response(201)
+        
+        #For sinking Battleship
+        elif return_message == 202:
+            self.send_response(202)
+        
+        #For sinking cRuiser
+        elif return_message == 203:
+            self.send_response(203)
+
+        #For sinking Submarine
+        elif return_message == 204:
+            self.send_response(204)
+        
+        #For sinking Destroyer
+        elif return_message == 205:
+            self.send_response(205)
+
         self.send_response(return_message)
         self.end_headers()
         response = BytesIO()

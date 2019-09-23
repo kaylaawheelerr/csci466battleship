@@ -28,8 +28,16 @@ if response.status_code == 300:
     print("Miss! You suck!")
 if response.status_code == 350:
     print("Spot already chosen!")
-if response.status_code == 400:
-    print("You sunk a ship!")
+if response.status_code == 201:
+    print("You sunk the Carrier, good work!")
+if response.status_code == 202:
+    print("You sunk the Battleship, nice work!")
+if response.status_code == 203:
+    print("You sunk the cRuiser, nice!")
+if response.status_code == 204:
+    print("You sunk the Submarine!")
+if response.status_code == 205:
+    print("You sunk the Destroyer!")
 if response.status_code == 420:
     print("You won!")
 if response.status_code == 500:
