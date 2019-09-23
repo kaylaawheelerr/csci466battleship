@@ -65,8 +65,8 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
-                return sunkShip.encode()
-    return 420
+                return sunkShip
+    return 1
 
 
 #This takes the shot coordinates and opens the file and replaces the string row
@@ -108,7 +108,10 @@ def shotTaken(xCoord, yCoord):
 
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
-        if sink == 1:
+        checkWin = countBoard(personal_board)
+        if checkWin  == 16:
+            return 420
+        elif sink == 1:
             return 1
         return sink
 
@@ -130,7 +133,8 @@ def shotTaken(xCoord, yCoord):
         for i in tempBoard2:
             board2.write(i)
         board2.close()
-        return 300
+
+        return 0
     else:
         print("There has been a shot here already")
         return 350
@@ -153,7 +157,6 @@ def boardWrite(file):
 PORT = sys.argv[1]
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    url = 'http://localhost:8000'
     def do_GET(self):
         board_string = boardWrite(personal_board)
         board_string2 = boardWrite(enemy_board)
@@ -167,9 +170,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             +board_string2+ b"</h1></body></html>")
 
     def do_POST(self): 
+        url = 'http://localhost:8000?'
         content = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content)
         post_data = post_data.decode("utf-8")
+        print(url + str(post_data))
         coords = re.findall(r'\d+', post_data)
         x = int(coords[0])
         y = int(coords[1])
@@ -177,18 +182,28 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         #For a miss
         if return_message == 0:
+            print('Help miss')
             response = BytesIO()
             response.write(b'http://localhost:8000?miss=0')
             self.send_response(300)
 
         #For a hit
         elif return_message == 1:
+            print('Help hit')
             response = BytesIO()
             response.write(b'http://localhost:8000?hit=1')
             self.send_response(200)
 
+        #For a sink
+        elif return_message != int:
+            response = BytesIO()
+            aa = str(return_message)
+            sink_message = "http://localhost:8000?" + aa
+            sink_message = sink_message.encode()
+            response.write(bytes(sink_message))
+            self.send_response(200)
 
-        self.send_response(return_message)
+        #self.send_response(return_message)
         self.end_headers()
         response = BytesIO()
         response.write(b'This is POST request. ')
