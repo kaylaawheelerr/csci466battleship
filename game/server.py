@@ -60,7 +60,7 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 0
+                return 1
 
     sunkShip = 'hit=1\&sink=' + letterSpot
     for i in range(10):
@@ -73,9 +73,15 @@ def sunkTest(file,letterSpot):
 def shotTaken(xCoord, yCoord):
     xCoord = int(xCoord)
     yCoord = int(yCoord)
+    
     board = open(personal_board, "r")
     tempBoard = board.readlines()
     board.close()
+
+    board2 = open(enemy_board, "r")
+    tempBoard2 = board.readLines()
+    board2.close()
+
 
     print("Attempted to fire here " + str(xCoord) + " " + str(yCoord))
 
@@ -85,16 +91,25 @@ def shotTaken(xCoord, yCoord):
         letterSpot = str(tempBoard[yCoord][xCoord])
         tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
             "X" + tempBoard[yCoord][xCoord+1:]
+
+        tempBoard2[yCoord] = tempBoard2[yCoord][0:xCoord] + \
+            "X" + tempBoard2[yCoord][xCoord+1:]
+
         board = open(personal_board, "w")
+        board2 = open(enemy_board, "w")
 
         for i in tempBoard:
             board.write(i)
         board.close()
 
+        for i in tempBoard2:
+            board2.write(i)
+        board2.close()
+
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
-        if sink ==0:
-            return 0
+        if sink == 1:
+            return 1
         return sink
 
     #Here would be a miss and write a O on that spot
@@ -102,12 +117,20 @@ def shotTaken(xCoord, yCoord):
         print("Shot and a miss!")
         tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
             "O" + tempBoard[yCoord][xCoord+1:]
+        
+        tempBoard2[yCoord] = tempBoard2[yCoord][0:xCoord] + \
+            "O" + tempBoard2[yCoord][xCoord+1:]
         board = open(personal_board, "w")
+        board2 = open(enemy_board, "w")
 
         for i in tempBoard:
             board.write(i)
         board.close()
-        return "miss=0"
+
+        for i in tempBoard2:
+            board2.write(i)
+        board2.close()
+        return 300
     else:
         print("There has been a shot here already")
         return 350
