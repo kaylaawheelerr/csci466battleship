@@ -61,25 +61,17 @@ def sunkTest(file,letterSpot):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
                 return 1
-    if letterSpot == 'C':
-        return 201
-    elif letterSpot == 'B':
-        return 202
-    elif letterSpot == 'R':
-        return 203
-    elif letterSpot == 'S':
-        return 204
-    elif letterSpot == 'D':
-        return 205
-    else:
-        return 1
+
+    sunkShip = "hit=1\&sink=" + letterSpot
+    sunkShip.encode()
+    sunkShip.end_headers()
+    return sunkShip
 
 
 #This takes the shot coordinates and opens the file and replaces the string row
 def shotTaken(xCoord, yCoord):
     xCoord = int(xCoord)
     yCoord = int(yCoord)
-
     board = open(personal_board, "r")
     tempBoard = board.readlines()
     board.close()
@@ -163,25 +155,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         elif return_message == 1:
             self.send_response(200)
         
-        #For sinking Carrier
-        elif return_message == 201:
-            self.send_response(201)
-        
-        #For sinking Battleship
-        elif return_message == 202:
-            self.send_response(202)
-        
-        #For sinking cRuiser
-        elif return_message == 203:
-            self.send_response(203)
 
-        #For sinking Submarine
-        elif return_message == 204:
-            self.send_response(204)
-        
-        #For sinking Destroyer
-        elif return_message == 205:
-            self.send_response(205)
 
         self.send_response(return_message)
         self.end_headers()
