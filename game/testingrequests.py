@@ -9,7 +9,7 @@ ip_address = socket.gethostbyname(local_hostname)
 # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
 # get local machine name
-port = 8080
+port = sys.argv[3]
 # connection to hostname on the port.
 # s.connect((local_hostname, port))                               
 # Receive no more than 1024 bytes
@@ -31,7 +31,8 @@ port = 8080
 # #     time.sleep(2)
 
 # # close connection
-url = 'http://' + ip_address + ':8080' 
+# url = 'http://' + ip_address + ':8000' 
+url = 'http://localhost:'+port
 headers = {
     'content-type': 'application/json',
 }
@@ -61,7 +62,10 @@ test = { 'x' : 7 , 'y' : 10}
 # # print(y.form)
 # # curl -d "foo=bar&bin=go" http://localhost:8080
 # # requests.get(url,test)
-requests.post(url,json=test)
+resp= requests.post(url,test)
+# resp = requests.Response
+# requests.
+print(resp)
 # respon=requests.Response
 # print(respon)
 # sock.sendall
