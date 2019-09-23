@@ -8,8 +8,8 @@ from io import BytesIO
 
 
 #default file paths being used
-personal_board = r"/Users/cole.sluggett/Documents/git/csci466battleship/game/own_board.txt"
-enemy_board = r"/Users/cole.sluggett/Documents/git/csci466battleship/game/opponent_board.txt"
+personal_board = "own_board.txt"
+enemy_board = "opponent_board.txt"
 
 
 #Counting a hit at the spot on the board if it is there
