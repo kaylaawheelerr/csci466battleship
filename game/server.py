@@ -60,12 +60,13 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 1
+                return 0
 
-    sunkShip = "hit=1\&sink=" + letterSpot
-    sunkShip.encode()
-    sunkShip.end_headers()
-    return sunkShip
+    sunkShip = 'hit=1\&sink=' + letterSpot
+    for i in range(10):
+        for j in range(10):
+            if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
+                return sunkShip.encode()
 
 
 #This takes the shot coordinates and opens the file and replaces the string row
@@ -92,8 +93,8 @@ def shotTaken(xCoord, yCoord):
 
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
-        if sink == 1:
-            return 1
+        if sink ==0:
+            return 0
         return sink
 
     #Here would be a miss and write a O on that spot
@@ -106,7 +107,7 @@ def shotTaken(xCoord, yCoord):
         for i in tempBoard:
             board.write(i)
         board.close()
-        return 0
+        return "miss=0"
     else:
         print("There has been a shot here already")
         return 350
