@@ -47,7 +47,6 @@ def print_board(file):
 
 
 def checkForInput(xCoord, yCoord):
-    Bstring = board_stringy(personal_board)
     if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
         return [404, "HTTP Not Found"]
     else:
