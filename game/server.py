@@ -100,7 +100,6 @@ def shotTaken(xCoord, yCoord):
 
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
-        print_board(personal_board)
         if sink == 1:
             return 1
         return sink
@@ -115,8 +114,10 @@ def shotTaken(xCoord, yCoord):
         for i in tempBoard:
             board.write(i)
         board.close()
-        print_board(personal_board)
         return 0
+    else:
+        print("There has been a shot here already")
+        return 350
 
 def boardWrite(file):
     f = open(file, "r")
