@@ -12,6 +12,30 @@ personal_board = "own_board.txt"
 enemy_board = "opponent_board.txt"
 
 
+def create_board(board_file):
+    f = open(board_file, "r")
+    if f.mode == 'r':
+        BOARD = (f.read())
+        BOARD = get_board_string(BOARD)  
+    return(BOARD)
+      
+def get_board_string(board):
+    board_string =str()
+    i=0
+    board = board.replace("_"," ")
+    BOARD = (board.split("\n"))
+    for line in BOARD:
+        board_string += "<div class= inline>"+str(i) + "<div class = 'grid-container'> </div>"
+        for character in line:
+            board_string += "<div class = 'grid-item'>" + character + "</div>"
+        board_string += "</div>"
+        i = i+1
+        if i ==10:
+            board_string = str.encode(board_string)
+            return(board_string)
+    board_string = str.encode(board_string)
+    return(board_string)
+
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
     board = open(file, "r")
@@ -108,6 +132,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
+        self.wfile.write(b"<html><style>.left{float:left}.opp{float:right}.inline{ display:flex}.grid-container{display: flex;}.grid-item{width: 35px; height: 35px; text-align:center; border:solid black 1px}</style><body><h1 class = 'container left'>"
+        +bytes(create_board(personal_board))+ 
+        b"</h1>"
+        +b"<h1 class='container opp'>"
+        +bytes(create_board(enemy_board))+
+        b"</h1></body></html>")
 
     def do_POST(self): 
         content = int(self.headers['Content-Length'])
@@ -127,6 +157,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         if x > -1 and x < 10 and y > -1 and y < 10:
             return_message.update(status=200)
             return_message = shotTaken(x,y,return_message)
+                self.wfile.write(b"<html><style>.left{float:left}.opp{float:right}.inline{ display:flex}.grid-container{display: flex;}.grid-item{width: 35px; height: 35px; text-align:center; border:solid black 1px}</style><body><h1 class = 'container left'>"
+                +bytes(create_board(personal_board))+ 
+                b"</h1>"
+                +b"<h1 class='container opp'>"
+                +bytes(create_board(enemy_board))+
+                b"</h1></body></html>")
         else:
             return_message.update(status=404)
             return_message.update(message='HTTP Not Found')
