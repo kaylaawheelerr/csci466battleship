@@ -41,8 +41,6 @@ def print_board(file):
     board.close()
     return board
 
-
-
 #A middleman subfunction that determines if the coordinates being sent in are allowed to be used
 def checkForInput(xCoord, yCoord):
     if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
@@ -201,7 +199,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             sink_message = "http://localhost:8000?" + aa
             sink_message = sink_message.encode()
             response.write(bytes(sink_message))
-            self.send_response(200)
+            self.send_response(400)
 
         #self.send_response(return_message)
         self.end_headers()
