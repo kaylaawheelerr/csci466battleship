@@ -47,6 +47,7 @@ def print_board(file):
 
 
 def checkForInput(xCoord, yCoord):
+    Bstring = board_stringy(personal_board)
     if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
         return [404, "HTTP Not Found"]
     else:
@@ -103,55 +104,40 @@ def shotTaken(xCoord, yCoord):
         print_board(personal_board)
         return 0
 
-
-# def checkForSink(file):
-#     counterCarrier = 0
-#     counterBattleShip = 0
-#     counterCruiser = 0
-#     counterSubmarine = 0
-#     counterDestroyer = 0
-#     sinkList = ""
-
-#     board = open(file, "r")
-#     s = board.readlines()
-#     board.close()
-#     print("Sinks so far:")
-#     for i in range(10):
-#         for j in range(10):
-#             if s[i][j] == "C":
-#                 counterCarrier += 1
-#             elif s[i][j] == "B":
-#                 counterBattleShip += 1
-#             elif s[i][j] == "R":
-#                 counterCruiser += 1
-#             elif s[i][j] == "S":
-#                 counterSubmarine += 1
-#             elif s[i][j] == "D":
-#                 counterDestroyer += 1
-#             else:
-#                 pass
-#     if counterCarrier == 0:
-#         sinklist = sinkList + "Carrier is sunk \n"
-#     if counterBattleShip == 0:
-#         sinklist = sinkList + "Battleship is sunk \n"
-#     if counterCruiser == 0:
-#         sinklist = sinkList + "Cruiser is sunk \n"
-#     if counterSubmarine == 0:
-#         sinklist = sinkList + "Submarine is sunk \n"
-#     if counterDestroyer == 0:
-#         sinklist = sinkList + "Destroyer is sunk \n"
-#     return sinkList
+def create_board(board_file):
+    f = open(board_file, "r")
+    if f.mode == 'r':
+        BOARD = (f.read())
+        print(BOARD)
+    return(BOARD)
 
 
-# BOARD = bytes()
-# create_board(sys.argv[1])
+def board_stringy(file):
+    f = open(file, "r")
+    print(f)
+    board_string =str()
+    for line in f:
+        board_string += "<div class = 'grid-container'>"
+        for character in line:
+            board_string += "<div class = 'grid-item'>" + character + "</div>"
+        board_string += "</div>"     
+    board_string = str.encode(board_string)
+    f.close()
+    return(board_string)
+
+
+#BOARD = create_board(sys.argv[2])
+PORT = sys.argv[1]
+#board_string = board_string(personal_board)
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-
     def do_GET(self):
+        board_string = board_stringy(personal_board)
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b'Hello, world!')
+        self.send_header('Content-type' , "text/html")
+        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+            +board_string+ b"</h1></body></html>")
 
     def do_POST(self): 
         content = int(self.headers['Content-Length'])
@@ -161,6 +147,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         x = int(coords[0])
         y = int(coords[1])
         return_message = checkForInput(x,y)
+        if return_message == 0:
+            self.send_response(300)
+        elif return_message == 1:
+            self.send_response(350)
         self.send_response(return_message)
         self.end_headers()
         response = BytesIO()
