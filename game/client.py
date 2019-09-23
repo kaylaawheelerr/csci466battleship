@@ -22,6 +22,7 @@ if sunk != 0 and sunk != 1:
 # if result[0] == '0':
 #     print('miss')
 
+print(response.headers)
 
 if response.status_code == 201:
     print("You got a hit!")
