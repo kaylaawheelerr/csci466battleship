@@ -58,7 +58,7 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 0
+                return 1
     sunkShip = 'hit=1\&sink=' + letterSpot
     for i in range(10):
         for j in range(10):
@@ -135,7 +135,7 @@ def shotTaken(xCoord, yCoord):
         return 0
     else:
         print("There has been a shot here already")
-        return 350
+        return 2
 
 def boardWrite(file):
     f = open(file, "r")
@@ -180,26 +180,29 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         #For a miss
         if return_message == 0:
-            print('Help miss')
             response = BytesIO()
             response.write(b'http://localhost:8000?miss=0')
             self.send_response(300)
 
         #For a hit
         elif return_message == 1:
-            print('Help hit')
             response = BytesIO()
             response.write(b'http://localhost:8000?hit=1')
             self.send_response(200)
 
         #For a sink
         elif return_message != int:
+            print('reckless')
             response = BytesIO()
             aa = str(return_message)
             sink_message = "http://localhost:8000?" + aa
             sink_message = sink_message.encode()
             response.write(bytes(sink_message))
             self.send_response(400)
+        else:
+            print("sad boy")
+            self.send_response(350)
+
 
         #self.send_response(return_message)
         self.end_headers()
