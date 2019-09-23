@@ -11,8 +11,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 
 #default file paths being used
-personal_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/game/own_board.txt"
-enemy_board = r"/Users/christianmarquardt/Documents/GitHub/csci466battleship/enemy_board.txt"
+personal_board = "own_board.txt"
+enemy_board = "enemy_board.txt"
 
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
@@ -60,13 +60,13 @@ def sunkTest(file,letterSpot):
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
-                return 1
-
+                return 0
     sunkShip = 'hit=1\&sink=' + letterSpot
     for i in range(10):
         for j in range(10):
             if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
                 return sunkShip.encode()
+    return 420
 
 
 #This takes the shot coordinates and opens the file and replaces the string row
@@ -79,7 +79,7 @@ def shotTaken(xCoord, yCoord):
     board.close()
 
     board2 = open(enemy_board, "r")
-    tempBoard2 = board.readLines()
+    tempBoard2 = board2.readlines()
     board2.close()
 
 
@@ -153,14 +153,18 @@ def boardWrite(file):
 PORT = sys.argv[1]
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-
+    url = 'http://localhost:8000'
     def do_GET(self):
         board_string = boardWrite(personal_board)
+        board_string2 = boardWrite(enemy_board)
         self.send_response(200)
         self.end_headers()
         self.send_header('Content-type' , "text/html")
         self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
             +board_string+ b"</h1></body></html>")
+
+        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+            +board_string2+ b"</h1></body></html>")
 
     def do_POST(self): 
         content = int(self.headers['Content-Length'])
@@ -173,12 +177,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         #For a miss
         if return_message == 0:
+            response = BytesIO()
+            response.write(b'http://localhost:8000?miss=0')
             self.send_response(300)
 
         #For a hit
         elif return_message == 1:
+            response = BytesIO()
+            response.write(b'http://localhost:8000?hit=1')
             self.send_response(200)
-        
 
 
         self.send_response(return_message)
