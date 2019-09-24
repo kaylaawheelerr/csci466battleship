@@ -13,7 +13,7 @@ from io import BytesIO
 #default file paths being used
 personal_board = "own_board.txt"
 enemy_board = "enemy_board.txt"
-
+shots_taken = "shots_taken.txt"
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
     board = open(file, "r")
@@ -43,7 +43,7 @@ def print_board(file):
 
 #A middleman subfunction that determines if the coordinates being sent in are allowed to be used
 def checkForInput(xCoord, yCoord):
-    if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
+    if xCoord > 9 or xCoord < 0 and yCoord > 9 or yCoord < 0:
         return [404, "HTTP Not Found"]
     else:
 
@@ -60,10 +60,6 @@ def sunkTest(file,letterSpot):
             if str(tempBoard[i][j]) == letterSpot:
                 return 0
     sunkShip = 'hit=1\&sink=' + letterSpot
-    for i in range(10):
-        for j in range(10):
-            if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
-                return sunkShip
     return 1
 
 
@@ -79,29 +75,49 @@ def shotTaken(xCoord, yCoord):
     board2 = open(enemy_board, "r")
     tempBoard2 = board2.readlines()
     board2.close()
+    
+    board3 = open(shots_taken, "r")
+    tempBoard3 = board3.readlines()
+    board3.close()
 
 
     print("Attempted to fire here " + str(xCoord) + " " + str(yCoord))
 
     #This spot is a hit on a ship
-    if tempBoard[yCoord][xCoord] != '_' and tempBoard[yCoord][xCoord] != 'X' and tempBoard[yCoord][xCoord] != 'O':
-        print("looks like we got a hit!")
+    if tempBoard2[yCoord][xCoord] != '_' and tempBoard2[yCoord][xCoord] != 'X' and tempBoard2[yCoord][xCoord] != 'O': 
+        # tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
+        #     "X" + tempBoard[yCoord][xCoord+1:]
         letterSpot = str(tempBoard[yCoord][xCoord])
-        tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
-            "X" + tempBoard[yCoord][xCoord+1:]
-
+        print("looks like we got a hit!")
         tempBoard2[yCoord] = tempBoard2[yCoord][0:xCoord] + \
             "X" + tempBoard2[yCoord][xCoord+1:]
+        
+        tempBoard3[yCoord] = tempBoard3[yCoord][0:xCoord] + \
+            "X" + tempBoard3[yCoord][xCoord+1:]
 
-        board = open(personal_board, "w")
+        # board = open(personal_board, "w")
+
+
+        # for i in tempBoard:
+        #     board.write(i)
+        # board.close()
         board2 = open(enemy_board, "w")
-
-        for i in tempBoard:
-            board.write(i)
-        board.close()
-
         for i in tempBoard2:
             board2.write(i)
+        board2.close()
+        
+        board3 = open(shots_taken, "r")
+        board2 = open(enemy_board, "r")
+        hit2 = board3.readlines()
+        board3.close()
+        board3 = open(shots_taken, "w")
+        hit = board2.readlines()
+        for i in hit:
+            if i == 'X' or i == 'O':
+                board3.write(i) 
+            else:
+                board3.write(hit2[i])
+        board3.close()
         board2.close()
 
         #When we get a hit we want to check if we sunk the ship or not
@@ -110,27 +126,33 @@ def shotTaken(xCoord, yCoord):
         if checkWin  == 16:
             return 420
         elif sink == 1:
-            return 1
-        return sink
+            return 2
+        return 1
 
     #Here would be a miss and write a O on that spot
     elif tempBoard[yCoord][xCoord] == "_":
-        print("Shot and a miss!")
-        tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
-            "O" + tempBoard[yCoord][xCoord+1:]
-        
+        # tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
+        #     "O" + tempBoard[yCoord][xCoord+1:]
+        print("Shot and a miss!")        
         tempBoard2[yCoord] = tempBoard2[yCoord][0:xCoord] + \
             "O" + tempBoard2[yCoord][xCoord+1:]
-        board = open(personal_board, "w")
-        board2 = open(enemy_board, "w")
 
-        for i in tempBoard:
-            board.write(i)
-        board.close()
+        tempBoard3[yCoord] = tempBoard3[yCoord][0:xCoord] + \
+            "O" + tempBoard3[yCoord][xCoord+1:]
+        # board = open(personal_board, "w")
+        board2 = open(enemy_board, "w")
+        board3 = open(shots_taken,"w")
+
+        # for i in tempBoard:
+        #     board.write(i)
+        # board.close()
 
         for i in tempBoard2:
             board2.write(i)
         board2.close()
+        for i in tempBoard3:
+            board3.write(i)
+        board3.close()
 
         return 0
     else:
@@ -156,16 +178,19 @@ PORT = sys.argv[1]
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        board_string = boardWrite(personal_board)
-        board_string2 = boardWrite(enemy_board)
+        personal_string_board = boardWrite(personal_board)
+        enemy_string_board = boardWrite(enemy_board)
+        shot_string_board = boardWrite(shots_taken)
+
         self.send_response(200)
         self.end_headers()
         self.send_header('Content-type' , "text/html")
         self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
-            +board_string+ b"</h1></body></html>")
-
+            +personal_string_board+ b"</h1></body></html>")
         self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
-            +board_string2+ b"</h1></body></html>")
+            +shot_string_board+ b"</h1></body></html>")
+        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+            +enemy_string_board+ b"</h1></body></html>")
 
     def do_POST(self): 
         url = 'http://localhost:8000?'
@@ -193,7 +218,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
 
         #For a sink
-        elif return_message != int:
+        elif return_message == 2:
             response = BytesIO()
             aa = str(return_message)
             sink_message = "http://localhost:8000?" + aa
