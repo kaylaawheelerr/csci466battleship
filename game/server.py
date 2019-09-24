@@ -106,19 +106,22 @@ def shotTaken(xCoord, yCoord):
             board2.write(i)
         board2.close()
         
-        board3 = open(shots_taken, "r")
-        board2 = open(enemy_board, "r")
-        hit2 = board3.readlines()
-        board3.close()
+        # board3 = open(shots_taken, "r")
+        # board2 = open(enemy_board, "r")
+        # hit2 = board3.readlines()
+        # board3.close()
         board3 = open(shots_taken, "w")
-        hit = board2.readlines()
-        for i in hit:
-            if i == 'X' or i == 'O':
-                board3.write(i) 
-            else:
-                board3.write(hit2[i])
+        for i in tempBoard3:
+            board3.write(i)
         board3.close()
-        board2.close()
+        # hit = board2.readlines()
+        # for i in hit:
+        #     if i == 'X' or i == 'O':
+        #         board3.write(i) 
+        #     else:
+        #         board3.write(hit2[i])
+        # board3.close()
+        # board2.close()
 
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
@@ -199,6 +202,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         post_data = post_data.decode("utf-8")
         print(url + str(post_data))
         coords = re.findall(r'\d+', post_data)
+        print(coords)
         x = int(coords[0])
         y = int(coords[1])
         return_message = checkForInput(x,y)
@@ -226,7 +230,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             response.write(bytes(sink_message))
             self.send_response(400)
 
-        #self.send_response(return_message)
         self.end_headers()
         response = BytesIO()
         response.write(b'This is POST request. ')
