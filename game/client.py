@@ -4,7 +4,6 @@ import json
 import sys
 local_hostname = socket.gethostname()
 ip_address = socket.gethostbyname(local_hostname)
-ip = 'http://'+ip_address
 url = 'http://localhost:8000' 
 myobj = { 'x' : sys.argv[1] , 'y' : sys.argv[2] }
 response = (requests.post(url,myobj))

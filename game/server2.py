@@ -127,6 +127,7 @@ def shotTaken(xCoord, yCoord):
     else:
         return 350
 
+PORT = sys.argv[1]
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -173,5 +174,5 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
         self.wfile.write(response.getvalue())
 
-httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('localhost', 5000), SimpleHTTPRequestHandler)
 httpd.serve_forever()
