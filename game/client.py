@@ -13,35 +13,40 @@ enemy_board = "opponent_board.txt"
 myobj = { 'x' : x , 'y' : y }
 response = (requests.post(url,myobj))
 
-shot_board = open(enemy_board, "r")
-tempShotBoard = shot_board.readlines()
-shot_board.close()
+try:
+    x = int(x)
+    y = int(y)
 
-if response.headers.get('hit') == 1:
-    tempShotBoard[y] = tempShotBoard[y][0:x] + \
-        "X" + tempShotBoard[y][x+1:]
-elif response.headers.get('hit') == 0 and response.headers.get('message') == '':
-    tempShotBoard[y] = tempShotBoard[y][0:x] + \
-        "O" + tempShotBoard[y][x+1:]
+    shot_board = open(enemy_board, "r")
+    tempShotBoard = shot_board.readlines()
+    shot_board.close()
 
-shot_board = open(enemy_board, "w")
-for i in tempShotBoard:
-    print(i)
-    shot_board.write(i)
-shot_board.close()
+    if response.headers.get('hit') == '1':
+        tempShotBoard[y] = tempShotBoard[y][0:x] + \
+            "X" + tempShotBoard[y][x+1:]
+    elif response.headers.get('hit') == '0' and response.headers.get('message') == '':
+        tempShotBoard[y] = tempShotBoard[y][0:x] + \
+            "O" + tempShotBoard[y][x+1:]
+
+    shot_board = open(enemy_board, "w")
+    for i in tempShotBoard:
+        shot_board.write(i)
+    shot_board.close()
+except: 
+    print("Error occured on client side!")
 
 if response.status_code == 200:
-    if response.headers.get('hit') == 0:
+    if response.headers.get('hit') == '0':
         print('Miss! You Suck!')
     else:
         print('You hit it')
-    if response.headers.get('sink') != 0:
+    if response.headers.get('sink') != '0':
         print('You sunk ' + response.headers.get('sink'))
-    if response.headers.get('win') == 1:
+    if response.headers.get('win') == '1':
         print('All ships sunk. You win!')
 elif response.status_code == 404:
     print(response.headers.get('message') + ' - You shot off of board!')
 elif response.status_code == 409:
     print(response.headers.get('message') + ' - You already shot here!')
-
-
+elif response.status_code == 400:
+    print(response.headers.get('message') + ' - Wrong Format!')

@@ -45,11 +45,13 @@ def sunkTest(file,letterSpot,return_message):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
                 return return_message
-            if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
-                return_message.update(sink = letterSpot)
-                return return_message
     return_message.update(sink=letterSpot)
     return_message.update(win=1)
+    for i in range(10):
+        for j in range(10):
+            if tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != '_':
+                return_message.update(win=0)
+    
     return return_message
 
 def shotTaken(xCoord, yCoord, return_message):
@@ -115,8 +117,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content)
         post_data = post_data.decode("utf-8")
         coords = re.findall(r'\d+', post_data)
-        x = int(coords[0])
-        y = int(coords[1])
         response = BytesIO()
         return_message = {
             'status' : 0,
@@ -125,12 +125,18 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             'win' : 0,
             'message' : ''
         }
-        if x > -1 and x < 10 and y > -1 and y < 10:
-            return_message.update(status=200)
-            return_message = shotTaken(x,y,return_message)
-        else:
-            return_message.update(status=404)
-            return_message.update(message='HTTP Not Found')
+        try:
+            x = int(coords[0])
+            y = int(coords[1])
+            if x > -1 and x < 10 and y > -1 and y < 10:
+                return_message.update(status=200)
+                return_message = shotTaken(x, y, return_message)
+            else:
+                return_message.update(status=404)
+                return_message.update(message='HTTP Not Found')
+        except:
+            return_message.update(status=400)
+            return_message.update(message='Bad HTTP Request')
 
         self.send_response(return_message.get('status'))
         for key in return_message:
