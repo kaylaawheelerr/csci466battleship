@@ -9,6 +9,7 @@ url = 'http://localhost:8000'
 myobj = { 'x' : sys.argv[1] , 'y' : sys.argv[2] }
 response = (requests.post(url,myobj))
 print(response)
+
 if response.status_code == 200:
     print("You got a hit!")
 if response.status_code == 300:

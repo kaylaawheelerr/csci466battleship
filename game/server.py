@@ -140,7 +140,7 @@ def shotTaken(xCoord, yCoord):
 def boardWrite(file):
     f = open(file, "r")
     print(f)
-    board_string =str()
+    board_string = str()
     for line in f:
         board_string += "<div class = 'grid-container'>"
         for character in line:
@@ -161,11 +161,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.send_header('Content-type' , "text/html")
-        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+        self.wfile.write(b"<html><h1 class = 'test'>Personal Board</h1><style>.grid-container{display: flex; width: 300px}.grid-item{width: 25px;}</style><body><h1 class = 'container test'>"
             +board_string+ b"</h1></body></html>")
 
-        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+        self.wfile.write(b"<html><h1>Enemy Board</h1><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
             +board_string2+ b"</h1></body></html>")
+        
+        self.wfile.write(b"<body><p> Carrier = C <br> Battleship = B <br> cRuise = R <br> Submarine = S <br> Destroyer = D</p><style> p{float: right}</style>")
 
     def do_POST(self): 
         url = 'http://localhost:8000?'
@@ -204,7 +206,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(350)
 
 
-        #self.send_response(return_message)
+        self.send_response(return_message)
         self.end_headers()
         response = BytesIO()
         response.write(b'This is POST request. ')
