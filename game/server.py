@@ -8,7 +8,7 @@ from io import BytesIO
 
 
 #default file paths being used
-personal_board = "own_board.txt"
+personal_board = sys.argv[2]
 enemy_board = "opponent_board.txt"
 
 
@@ -36,25 +36,6 @@ def get_board_string(board):
     board_string = str.encode(board_string)
     return(board_string)
 
-#Counting a hit at the spot on the board if it is there
-def countHit(file, xCoord, yCoord):
-    board = open(file, "r")
-    s = board.readlines()
-    board.close()
-    return s[yCoord][xCoord]
-
-
-#checks the entire board for hits to see if there is a winner
-def countBoard(file):
-    numHits = 0
-    for i in range(10):
-        for j in range(10):
-            hit = countHit(file, i, j)
-            if hit == 'X' or hit == 'O':
-                numHits += 1
-    return numHits
-
-
 #Here will process the shot
 def sunkTest(file,letterSpot,return_message):
     board = open(personal_board, "r")
@@ -65,7 +46,6 @@ def sunkTest(file,letterSpot,return_message):
             if str(tempBoard[i][j]) == letterSpot:
                 return return_message
             if tempBoard[i][j] != '_' and tempBoard[i][j] != 'X' and tempBoard[i][j] != 'O' and tempBoard[i][j] != 'O':
-                sunkShip = 'hit=1\&sink=' + letterSpot
                 return_message.update(sink = letterSpot)
                 return return_message
     return_message.update(sink=letterSpot)
@@ -78,9 +58,7 @@ def shotTaken(xCoord, yCoord, return_message):
     tempBoard = board.readlines()
     board.close()
 
-    shot_board = open(enemy_board, "r")
-    tempShotBoard = shot_board.readlines()
-    shot_board.close()
+    
 
     print("Attempted to fire here " + str(xCoord) + " " + str(yCoord))
 
@@ -90,17 +68,15 @@ def shotTaken(xCoord, yCoord, return_message):
         letterSpot = str(tempBoard[yCoord][xCoord])
         tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
             "X" + tempBoard[yCoord][xCoord+1:]
-        tempShotBoard[yCoord] = tempShotBoard[yCoord][0:xCoord] + \
-            "X" + tempShotBoard[yCoord][xCoord+1:]
+        
         board = open(personal_board, "w")
-        shot_board = open(enemy_board, "w")
+        
 
         for i in tempBoard:
             board.write(i)
-        for i in tempShotBoard:
-            shot_board.write(i)
+
         board.close()
-        shot_board.close()
+
         return_message.update(hit=1)
         return_message = sunkTest(board,letterSpot,return_message)
         return return_message
@@ -109,17 +85,11 @@ def shotTaken(xCoord, yCoord, return_message):
         print("Shot and a miss!")
         tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
             "O" + tempBoard[yCoord][xCoord+1:]
-        tempShotBoard[yCoord] = tempShotBoard[yCoord][0:xCoord] + \
-            "O" + tempShotBoard[yCoord][xCoord+1:]
         board = open(personal_board, "w")
-        shot_board = open(enemy_board, "w")
 
         for i in tempBoard:
             board.write(i)
-        for i in tempShotBoard:
-            shot_board.write(i)
         board.close()
-        shot_board.close()
         return return_message
 
     else:
@@ -155,7 +125,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             'win' : 0,
             'message' : ''
         }
-        print(return_message)
         if x > -1 and x < 10 and y > -1 and y < 10:
             return_message.update(status=200)
             return_message = shotTaken(x,y,return_message)
@@ -163,12 +132,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             return_message.update(status=404)
             return_message.update(message='HTTP Not Found')
 
-        print(return_message.get('status'))
         self.send_response(return_message.get('status'))
         for key in return_message:
             self.send_header(key,return_message.get(key))
         self.end_headers()
         self.wfile.write(response.getvalue())
 
-httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('localhost', int(sys.argv[1])), SimpleHTTPRequestHandler)
 httpd.serve_forever()

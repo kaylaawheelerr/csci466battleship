@@ -6,36 +6,42 @@ import re
 
 local_hostname = socket.gethostname()
 ip_address = socket.gethostbyname(local_hostname)
-url = 'http://localhost:8000' 
-
-myobj = { 'x' : sys.argv[1] , 'y' : sys.argv[2] }
-
+url = 'http://localhost:' + sys.argv[1] 
+x = sys.argv[2]
+y = sys.argv[3]
+enemy_board = "opponent_board.txt"
+myobj = { 'x' : x , 'y' : y }
 response = (requests.post(url,myobj))
-response_message = response.text
-result = re.findall(r'\d+', response_message)
-sunk = response_message[-1:]
-if sunk != 0 and sunk != 1:
-    print(sunk)
 
-# if result[0] == '1':
-#     print('hit')
-# if result[0] == '0':
-#     print('miss')
+shot_board = open(enemy_board, "r")
+tempShotBoard = shot_board.readlines()
+shot_board.close()
 
-print(response.headers)
+if response.headers.get('hit') == 1:
+    tempShotBoard[y] = tempShotBoard[y][0:x] + \
+        "X" + tempShotBoard[y][x+1:]
+elif response.headers.get('hit') == 0 and response.headers.get('message') == '':
+    tempShotBoard[y] = tempShotBoard[y][0:x] + \
+        "O" + tempShotBoard[y][x+1:]
 
-if response.status_code == 201:
-    print("You got a hit!")
-if response.status_code == 300:
-    print("Miss! You suck!")
-if response.status_code == 208:
-    print('You shot off the board')
-if response.status_code == 350:
-    print("Spot already chosen!")
-if response.status_code == 400:
-    print("Hit and You sunk a ship!")
-if response.status_code == 420:
-    print("Hit, Sunk, and You won!")
-if response.status_code == 500:
-    print("You lost!")
+shot_board = open(enemy_board, "w")
+for i in tempShotBoard:
+    print(i)
+    shot_board.write(i)
+shot_board.close()
+
+if response.status_code == 200:
+    if response.headers.get('hit') == 0:
+        print('Miss! You Suck!')
+    else:
+        print('You hit it')
+    if response.headers.get('sink') != 0:
+        print('You sunk ' + response.headers.get('sink'))
+    if response.headers.get('win') == 1:
+        print('All ships sunk. You win!')
+elif response.status_code == 404:
+    print(response.headers.get('message') + ' - You shot off of board!')
+elif response.status_code == 409:
+    print(response.headers.get('message') + ' - You already shot here!')
+
 
