@@ -14,16 +14,7 @@ from io import BytesIO
 personal_board = "own_board.txt"
 enemy_board = "enemy_board.txt"
 shots_taken = "shots_taken.txt"
-<<<<<<< HEAD
 PORT = sys.argv[2]
-#Counting a hit at the spot on the board if it is there
-def countHit(file, xCoord, yCoord):
-    board = open(file, "r")
-    s = board.readlines()
-    board.close()
-    return s[yCoord][xCoord]
-=======
->>>>>>> 993b1648e72b44a632c91ffc5a00b4e9131a80df
 
 
 def checkWin(file):
