@@ -14,6 +14,7 @@ from io import BytesIO
 personal_board = "own_board.txt"
 enemy_board = "enemy_board.txt"
 shots_taken = "shots_taken.txt"
+<<<<<<< HEAD
 PORT = sys.argv[2]
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
@@ -21,17 +22,24 @@ def countHit(file, xCoord, yCoord):
     s = board.readlines()
     board.close()
     return s[yCoord][xCoord]
+=======
+>>>>>>> 993b1648e72b44a632c91ffc5a00b4e9131a80df
 
 
-#checks the entire board for hits to see if there is a winner
-def countBoard(file):
-    numHits = 0
+def checkWin(file):
+    countShipLives = 0
+    board = open(file, "r")
+    tempBoard = board.readlines()
+    board.close()
     for i in range(10):
         for j in range(10):
-            hit = countHit(file, i, j)
-            if hit == 'X' or hit == 'O':
-                numHits += 1
-    return numHits
+            checker = str(tempBoard[i][j])
+            if checker != "_" and checker != "O" and checker != "X":
+                countShipLives += 1
+    if countShipLives == 0:
+        return "win"
+    else:
+       return "keep going"
 
 
 #A simple print board method
@@ -44,7 +52,7 @@ def print_board(file):
 
 #A middleman subfunction that determines if the coordinates being sent in are allowed to be used
 def checkForInput(xCoord, yCoord):
-    if xCoord > 9 or xCoord < 0 and yCoord > 9 or yCoord < 0:
+    if xCoord > 9 and xCoord < 0 and yCoord > 9 and yCoord < 0:
         return [404, "HTTP Not Found"]
     else:
 
@@ -53,14 +61,13 @@ def checkForInput(xCoord, yCoord):
 
 #Test to see if we sunk the ship or not and pass that through
 def sunkTest(file,letterSpot):
-    board = open(personal_board, "r")
+    board = open(enemy_board, "r")
     tempBoard = board.readlines()
     board.close()
     for i in range(10):
         for j in range(10):
             if str(tempBoard[i][j]) == letterSpot:
                 return 0
-    sunkShip = 'hit=1\&sink=' + letterSpot
     return 1
 
 # TODO
@@ -130,15 +137,15 @@ def shotTaken(xCoord, yCoord):
 
         #When we get a hit we want to check if we sunk the ship or not
         sink = sunkTest(board,letterSpot)
-        checkWin = countBoard(personal_board)
-        if checkWin  == 16:
-            return 420
+        checkForWin = checkWin(enemy_board)
+        if checkForWin  == "win":
+            return 3
         elif sink == 1:
             return 2
         return 1
 
     #Here would be a miss and write a O on that spot
-    elif tempBoard[yCoord][xCoord] == "_":
+    elif tempBoard2[yCoord][xCoord] == "_":
         # tempBoard[yCoord] = tempBoard[yCoord][0:xCoord] + \
         #     "O" + tempBoard[yCoord][xCoord+1:]
         print("Shot and a miss!")        
@@ -193,11 +200,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.send_header('Content-type' , "text/html")
-        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+        self.wfile.write(b"<html><h1>Personal Board</h1><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
             +personal_string_board+ b"</h1></body></html>")
-        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+        self.wfile.write(b"<html><h1>Shot Board</h1><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
             +shot_string_board+ b"</h1></body></html>")
-        self.wfile.write(b"<html><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
+        self.wfile.write(b"<html><h1>Enemy Board</h1><style>.grid-container{display: flex;}.grid-item{width: 25px;}</style><body><h1 class = 'container'>"
             +enemy_string_board+ b"</h1></body></html>")
 
     def do_POST(self): 
@@ -234,6 +241,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             sink_message = sink_message.encode()
             response.write(bytes(sink_message))
             self.send_response(400)
+        elif return_message == 3:
+            print('Help win')
+            response = BytesIO()
+            response.write(b'http://localhost:8000?win=3')
+            self.send_response(420)
+        else:
+            print('Already taken')
+            self.send_response(350)
 
         self.end_headers()
         response = BytesIO()
