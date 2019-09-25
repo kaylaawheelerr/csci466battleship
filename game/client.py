@@ -21,3 +21,5 @@ if response.status_code == 420:
     print("You won!")
 if response.status_code == 500:
     print("You lost!")
+
+    #TODO make it send a second request to other port

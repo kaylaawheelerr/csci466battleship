@@ -7,13 +7,14 @@ import urllib
 import re
 import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
-
+import requests
 from io import BytesIO
 
 #default file paths being used
 personal_board = "own_board.txt"
 enemy_board = "enemy_board.txt"
 shots_taken = "shots_taken.txt"
+PORT = sys.argv[2]
 #Counting a hit at the spot on the board if it is there
 def countHit(file, xCoord, yCoord):
     board = open(file, "r")
@@ -62,9 +63,13 @@ def sunkTest(file,letterSpot):
     sunkShip = 'hit=1\&sink=' + letterSpot
     return 1
 
-
+# TODO
+# 1st should update own board and enemy shot board. depending on which port was supplied.
 #This takes the shot coordinates and opens the file and replaces the string row
 def shotTaken(xCoord, yCoord):
+    myobj = { 'x' : xCoord , 'y' : yCoord }
+    url = 'localhost:'+PORT
+    requests.post(url,myobj)
     xCoord = int(xCoord)
     yCoord = int(yCoord)
     
